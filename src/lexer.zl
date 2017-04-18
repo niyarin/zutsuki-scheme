@@ -1,0 +1,146 @@
+%{
+    const is_node = typeof require !== "undefined";
+    if (is_node){
+        module.exports = ZLexer;
+        var Zutsuki = require("./zutsuki");
+        var Exr = require("./external_representations");
+    }
+
+%}
+
+
+%zoption zlib ZLexer
+
+
+SYMBOL ([a-zA-Z]|[0-9]|[!$%&*+./:<=>?@^_~])+
+BOOLEAN #true|#false|#t|#f
+
+HEX_SCALAR_VALUE ([0-9]|[a-f])+
+CHARACTER_NAME alarm|backspace|delete|escape|newline|null|return|space|tab
+CHAR (#\\{CHARACTER_NAME}|#\\x{HEX_SCALAR_VALUE}|#\\.)
+
+STRING \".*\"
+
+NORMAL_COMMENT ;.*\n
+NESTED_COMMENT #\|(.|\n)*\|#
+COMMENT ({NORMAL_COMMENT}|{NESTED_COMMENT})
+
+UINTEGER [0-9]+
+NUMBER {UINTEGER}
+
+
+%%
+
+(\ |\t) {
+    console.log("SP");
+}
+
+\n {
+    console.log("NL");
+}
+
+#\( {
+    console.log("VECTOR-LP");
+    return "#(";
+}
+
+\( {
+    console.log("LP");   
+    return "(";
+}
+
+\) {
+    console.log("RP");
+    return ")";
+}
+
+\. {
+    console.log("DOT");   
+    return ".";
+}
+
+
+\' {
+    console.log("QUOTE");
+    return "'";
+}
+
+\` {
+    console.log("QQ");
+    return "`";
+}
+
+,@ {
+    console.log("UNQUOTE SPLICING");   
+    return ",@";
+}
+
+, {
+    console.log("UNQUOTE");
+    return ",";
+}
+
+{NUMBER} {
+    console.log("NUMBER",ztext,zline);
+}
+
+{SYMBOL} {
+    console.log("SYMBOL",ztext,zline);   
+    return new Zutsuki.Symbol(ztext,zline,"FILE");
+}
+
+{BOOLEAN} {
+    console.log("BOOLEAN",ztext,zline);
+}
+
+{CHAR} {
+    console.log("CHAR",ztext,zline);
+}
+
+{STRING} {
+    console.log("STRING",ztext,zline);
+}
+
+
+{COMMENT} {
+    console.log("COMMENT");
+}
+
+
+
+
+#{UINTEGER} {
+    console.log("DATUM LABEL",ztext);
+    return new Zutsuki.Datum_label(parseInt(ztext.substr(1)));
+}
+
+# {
+    return "#";
+}
+
+
+%%
+
+//テスト
+ZLexer.input = "(cons abc #0=(a b c #0#) )";
+
+
+function test_lex(){
+    var ret = [];
+    while (true){
+        var v = ZLexer.lex();
+        if (v === null){
+            break;   
+        }
+        if (v){
+            ret.push(v);
+            console.log(v);
+        }
+    }
+    return ret;
+}
+var exps = Exr.convert_external_representation(test_lex(),true);
+
+for (var i=0;i<exps.length;i++){
+    console.log(exps[i]);
+}
