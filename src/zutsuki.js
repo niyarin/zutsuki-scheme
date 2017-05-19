@@ -14,7 +14,14 @@ Zutsuki.TYPE_STRING = 4;
 Zutsuki.TYPE_NUMBER = 5;
 Zutsuki.TYPE_BYTEVECTOR = 6;
 Zutsuki.TYPE_VECTOR = 7;
+Zutsuki.TYPE_BOOLEAN = 8
+Zutsuki.TYPE_SYNTAX = 10;
+
+Zutsuki.NUMBER_TYPE_UNSIGNED_INTEGER = 1;
+
 Zutsuki.TYPE_DATUM_LABEL = 100;
+Zutsuki.TYPE_CONST_VARIABLE = 101;
+Zutsuki.TYPE_INLINE_FUNCTION = 102;
 
 Zutsuki.ERROR = {"reason":""};
 
@@ -49,7 +56,11 @@ Zutsuki.String = function(data){
 
 Zutsuki.Boolean = function(data){
     this.type = Zutsuki.TYPE_BOOLEAN;
-    this.data = data;
+    if (data == "#t"||data == "#true"){
+        this.data = true;
+    }else{
+        this.data = false;
+    }
 }
 
 Zutsuki.Number = function(data,type){
@@ -68,22 +79,39 @@ Zutsuki.Vector = function(data){
     this.data = data;
 }
 
+
+
 Zutsuki.Datum_label = function(data){
     this.type = Zutsuki.TYPE_DATUM_LABEL;
     this.data = data;
 }
 
+Zutsuki.Const_variable = function(data){
+    this.type = Zutsuki.TYPE_CONST_VARIABLE;
+    this.data = data;
+}
+
+Zutsuki.Inline_function = function(data){
+  this.type = Zutsuki.TYPE_INLINE_FUNCTION;
+  this.data = data;
+}
+
+
+
+
+
 //短縮
-Zutsuki.ZP = function(data,line,filename){
-    return new Zutsuki.Pair(data,line,filename);
+Zutsuki.ZP = function(car,cdr){
+    return new Zutsuki.Pair(car,cdr);
 }
 
-
-
-
-Zutsuki.Expand_env = function(){
-
-
+Zutsuki.SYM = function(data){
+   return new Zutsuki.Symbol(data,-1,Zutsuki.GENERATED_TAG);
 }
 
-
+Zutsuki.TRUE = function(data){
+    return new Zutsuki.Boolean("#t");
+}
+Zutsuki.FALSE = function(data){
+    return new Zutsuki.Boolean("#f");
+}
