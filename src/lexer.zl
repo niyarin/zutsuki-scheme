@@ -99,6 +99,7 @@ NUMBER {UINTEGER}
 
 {CHAR} {
     console.log("CHAR",ztext,zline);
+    return new Zutsuki.Char(ztext);
 }
 
 {STRING} {
