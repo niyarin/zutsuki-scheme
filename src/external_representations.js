@@ -8,6 +8,10 @@ if (is_node){
 
 
 var scheme_test_print = function(a){
+    if (!a){
+        console.log("()");
+        return;
+    }
     if (a.type == Zutsuki.TYPE_PAIR){
         if (a.circle_flag){
             console.log(" ( ... ) ");
@@ -48,7 +52,14 @@ Exr.convert_external_representation = function(input,prepro_flag){
             var ret = Zutsuki.ZP(null,null);
             var ret_head = ret;
             for (var i=1;i<a.length;i++){
-                ret.cdr = Zutsuki.ZP(a[i],null);
+                if (a[i] == "."){
+                  if (i == a.length-1){
+                    throw "ERR";
+                  }
+                  ret.cdr = a[i+1];
+                }else{
+                  ret.cdr = Zutsuki.ZP(a[i],null);
+                }
                 ret = ret.cdr;
             }
             return ret_head.cdr;
@@ -102,7 +113,7 @@ Exr.convert_external_representation = function(input,prepro_flag){
                     if (typeof list[p-1] == "object" && list[p-1].type == Zutsuki.TYPE_DATUM_LABEL){
                         list[p-1] = list[p-1].data;
                     }
-                }else if (typeof list[p-1] == "object" && list[p-1].data == "="){
+                }else if (typeof list[p-1] == "object" && list[p-1] && list[p-1].data == "="){
                     //list[p]がdatum_labelのときerror
                     if (typeof list[p-2] == "object" && list[p-2].type == Zutsuki.TYPE_DATUM_LABEL){
                         list[p-2] = label_expand(list[p],list[p-2].data,list[p]);
