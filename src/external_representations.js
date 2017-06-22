@@ -37,7 +37,7 @@ var scheme_test_print = function(a){
 
 
 
-Exr.convert_external_representation = function(input,prepro_flag){
+Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
     const atom_and_container_objects = [];
     {
         //括弧を内部表現化する。
@@ -166,6 +166,16 @@ Exr.convert_external_representation = function(input,prepro_flag){
                 }
             }
             pos++;
+        }
+
+        if (parentheses_stack.length > 0){
+            //括弧が閉じられていないケース
+            if (is_repl_mode){
+            
+            }else{
+                throw "ERROR";
+            }           
+
         }
     }
 
