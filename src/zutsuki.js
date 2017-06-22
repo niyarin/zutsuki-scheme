@@ -17,6 +17,8 @@ Zutsuki.TYPE_VECTOR = 7;
 Zutsuki.TYPE_BOOLEAN = 8
 Zutsuki.TYPE_SYNTAX = 10;
 
+Zutsuki.TYPE_ERROR = 11;
+
 Zutsuki.NUMBER_TYPE_UNSIGNED_INTEGER = 1;
 
 Zutsuki.TYPE_DATUM_LABEL = 100;
@@ -97,7 +99,12 @@ Zutsuki.Inline_function = function(data){
 }
 
 
-
+Zutsuki.Error = function(message,file,line){
+    this.type = Zutsuki.TYPE_ERROR;
+    this.message = message;
+    this.file = file;
+    this.line = line;
+}
 
 
 //短縮
