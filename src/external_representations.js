@@ -100,7 +100,8 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
             //quote quasiquote の記号を展開、<label>=の展開
             var ret = [];
             var p = list.length-1;
-            while (p>0){
+            while (p>0){//!!後ろから探索している
+                console.log("!!",list[p]);
                 if (list[p-1] == "'"){
                     list[p-1] = Zutsuki.ZP(quote_symbol,Zutsuki.ZP(list[p],null));
                 }else if (list[p-1] == "`"){
@@ -114,14 +115,12 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
                         list[p-1] = list[p-1].data;
                     }
                 }else if (typeof list[p-1] == "object" && list[p-1] && list[p-1].data == "="){
-                    //list[p]がdatum_labelのときerror
                     if (typeof list[p-2] == "object" && list[p-2].type == Zutsuki.TYPE_DATUM_LABEL){
                         list[p-2] = label_expand(list[p],list[p-2].data,list[p]);
                         p--;
                     }else{
-                        //error
+                        //ただの=
                     }
-
                 }else{
                     ret.unshift(list[p]);
                 }
@@ -136,6 +135,8 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
 
         const parentheses_stack = [];
         const end = input.length;
+
+        const global_atoms = [];//括弧の外側のdatum labelを別で処理するためのコンテナ
         var pos = 0; 
         while (pos<end){
 
@@ -152,7 +153,8 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
                             tgt = a2p(tgt);
                         }
                     }else{
-                        //error(extra close)
+                        //余計な括弧がある
+                        throw new Zutsuki.Error("extra close parentheses");
                     }
                 }else{
                     tgt = input[pos];
@@ -162,7 +164,19 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
                 if (parentheses_stack.length){
                     parentheses_stack[0].push(tgt);
                 }else{
-                    atom_and_container_objects.push(tgt);
+                    if (tgt && typeof tgt == "object" && tgt.type == Zutsuki.TYPE_PAIR){
+                        if (global_atoms.length == 0){
+                            atom_and_container_objects.push(tgt);
+                        }else{
+                            global_atoms.push(tgt);
+                            var dexpand_res = datum_expand(global_atoms);
+                            for (var i=0;i<dexpand_res.length;i++){
+                                atom_and_container_objects.push(dexpand_res[i]);
+                            }
+                        }
+                    }else{
+                        global_atoms.push(tgt);
+                    }
                 }
             }
             pos++;
@@ -173,7 +187,7 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
             if (is_repl_mode){
             
             }else{
-                throw "ERROR";
+                throw new Zutsuki.Error("missing close parentheses");
             }           
 
         }
