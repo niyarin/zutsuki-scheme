@@ -24,6 +24,8 @@ Zutsuki.NUMBER_TYPE_UNSIGNED_INTEGER = 1;
 Zutsuki.TYPE_DATUM_LABEL = 100;
 Zutsuki.TYPE_CONST_VARIABLE = 101;
 Zutsuki.TYPE_INLINE_FUNCTION = 102;
+Zutsuki.TYPE_RENAMED_SYMBOL = 103;
+
 
 Zutsuki.ERROR = {"reason":""};
 
@@ -38,6 +40,13 @@ Zutsuki.Symbol = function(data,line,filename){
     this.line = line;
     this.filename = filename;
 }
+
+Zutsuki.RenamedSymbol = function(data){
+    this.type = Zutsuki.TYPE_RENAMED_SYMBOL;
+    this.data = data;
+    this.org = data;
+}
+
 
 Zutsuki.Pair = function(car,cdr){
     this.type = Zutsuki.TYPE_PAIR;
@@ -102,6 +111,7 @@ Zutsuki.Inline_function = function(data){
 Zutsuki.Error = function(message,file,line){
     this.type = Zutsuki.TYPE_ERROR;
     this.error_type = null;
+    this.error_stack = [];
     this.message = message;
     this.code = null;
     this.file = file;
@@ -239,6 +249,29 @@ Zutsuki.printer = function(obj){
     return loop(obj,{});
 }
 
+Zutsuki.zerror2string = function(zerr){
+    if (!zerr || typeof err != "object" || err.type != Zutsuki.TYPE_ERROR){
+        return "JS ERROR::" + zerr;
+    }
 
+    var res = zerr.message;
+    if (zerr.line && zerr.line > 1){
+        res += "  @[" + zerr.file + " " + zerr.line + "]";
+
+    }
+    if (zerr.code){
+        res += ":   " + Zutsuki.printer(zerr.code);
+    }
+
+    if (zerr.error_stack.length){
+        res += "\n\n---- MACRO TRACE ----";
+        for (var i=0;i<zerr.error_stack.length;i++){
+            var mm = Zutsuki.zerror2string(zerr.error_stack[i]);   
+            res += "\n" + mm;
+        }
+    }
+
+    return res;
+}
 
 
