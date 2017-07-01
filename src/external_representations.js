@@ -143,7 +143,7 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
             if (input[pos]  == "("){
                 parentheses_stack.unshift([0]);
             }else if (input[pos] == "#("){
-                parentheses_stack.unfhift([1]);
+                parentheses_stack.unshift([1]);
             }else {
                 var tgt = null;
                 if (input[pos] == ")"){
@@ -151,6 +151,13 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
                         tgt = datum_expand(parentheses_stack.shift());
                         if (tgt[0] == 0){
                             tgt = a2p(tgt);
+                        }else if (tgt[0] == 1){
+                            //vector literal
+                            var vector_data = new Array(tgt.length-1);
+                            for (var i=1;i<tgt.length;i++){
+                                vector_data[i-1] = tgt[i];
+                            }
+                            tgt = new Zutsuki.Vector(vector_data);
                         }
                     }else{
                         //余計な括弧がある
