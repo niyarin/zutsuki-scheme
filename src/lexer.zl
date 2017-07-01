@@ -4,7 +4,7 @@
         module.exports = ZLexer;
         var Zutsuki = require("./zutsuki");
     }
-
+    ZLexer.filename = "__filename__";
 %}
 
 
@@ -86,7 +86,7 @@ NUMBER {UINTEGER}
 
 {SYMBOL} {
     console.log("SYMBOL",ztext,zline);   
-    return new Zutsuki.Symbol(ztext,zline,"FILE");
+    return new Zutsuki.Symbol(ztext,zline,ZLexer.filename);
 }
 
 {BOOLEAN} {
