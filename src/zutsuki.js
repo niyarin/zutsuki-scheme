@@ -239,6 +239,8 @@ Zutsuki.printer = function(obj){
             }
         }else if (o.type == Zutsuki.TYPE_SYMBOL){
             return o.data;
+        }else if (o.type == Zutsuki.TYPE_RENAMED_SYMBOL){
+            return "<RENAME_" + o.data.data + ">";
         }else if (o.type == Zutsuki.TYPE_NUMBER){
             return o.data;
         }else{
@@ -250,7 +252,8 @@ Zutsuki.printer = function(obj){
 }
 
 Zutsuki.zerror2string = function(zerr){
-    if (!zerr || typeof err != "object" || err.type != Zutsuki.TYPE_ERROR){
+
+    if (!zerr || typeof zerr != "object" || zerr.type != Zutsuki.TYPE_ERROR){
         return "JS ERROR::" + zerr;
     }
 
