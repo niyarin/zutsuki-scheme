@@ -115,11 +115,13 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
                         list[p-1] = list[p-1].data;
                     }
                 }else if (typeof list[p-1] == "object" && list[p-1] && list[p-1].data == "="){
+                    ;// <label> = <datum> | <label>#
                     if (typeof list[p-2] == "object" && list[p-2].type == Zutsuki.TYPE_DATUM_LABEL){
                         list[p-2] = label_expand(list[p],list[p-2].data,list[p]);
                         p--;
                     }else{
                         //ただの=
+                        ret.unshift(list[p]);
                     }
                 }else{
                     ret.unshift(list[p]);
