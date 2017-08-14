@@ -113,7 +113,7 @@ REAL ({SIGN}({UINTEGER}\.{UINTEGER}))|{INFNAN}
 
 {STRING} {
     console.log("STRING",ztext,zline);
-    return new Zutsuki.String(ztext);
+    return new Zutsuki.String(ztext.substr(1,ztext.length-2));
 }
 
 
