@@ -24,9 +24,14 @@ NORMAL_COMMENT ;.*\n
 NESTED_COMMENT #\|(.|\n)*\|#
 COMMENT ({NORMAL_COMMENT}|{NESTED_COMMENT})
 
-UINTEGER [0-9]+
-NUMBER {UINTEGER}
 
+UINTEGER [0-9]+
+INFNAN \+inf\.0|-inf\.0|\+nan\.0|-nan\.0
+NUMBER {UINTEGER}
+SIGN (\+|-)?
+
+INTEGER {SIGN}{UINTEGER}
+REAL ({SIGN}({UINTEGER}\.{UINTEGER}))|{INFNAN}
 
 %%
 
@@ -79,10 +84,17 @@ NUMBER {UINTEGER}
     return ",";
 }
 
-{NUMBER} {
-    console.log("NUMBER",ztext,zline);
+
+{INTEGER} {
+    console.log("INTEGER",ztext,zline);
     return new Zutsuki.Number(ztext,Zutsuki.NUMBER_TYPE_UNSIGNED_INTEGER);
 }
+
+{REAL} {
+    console.log("INTEGER",ztext,zline);
+    return new Zutsuki.Number(ztext,Zutsuki.NUMBER_TYPE_REAL);
+}
+
 
 {SYMBOL} {
     console.log("SYMBOL",ztext,zline);   
@@ -101,6 +113,7 @@ NUMBER {UINTEGER}
 
 {STRING} {
     console.log("STRING",ztext,zline);
+    return new Zutsuki.String(ztext);
 }
 
 
