@@ -83,7 +83,6 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode,ac
             var ret = [];
             var p = list.length-1;
             while (p>0){//!!後ろから探索している
-                console.log("!!",list[p]);
                 if (list[p-1] == "'"){
                     list[p-1] = Zutsuki.ZP(quote_symbol,Zutsuki.ZP(list[p],null));
                 }else if (list[p-1] == "`"){
