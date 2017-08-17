@@ -138,7 +138,7 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
         const parentheses_stack = [];
         const end = input.length;
 
-        const global_atoms = [];//括弧の外側のdatum labelを別で処理するためのコンテナ
+        var global_atoms = [];//括弧の外側のdatum labelを別で処理するためのコンテナ
         var pos = 0; 
         while (pos<end){
 
@@ -182,6 +182,7 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
                             for (var i=0;i<dexpand_res.length;i++){
                                 atom_and_container_objects.push(dexpand_res[i]);
                             }
+                            global_atoms = [];
                         }
                     }else{
                         global_atoms.push(tgt);
@@ -189,6 +190,10 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
                 }
             }
             pos++;
+        }
+        
+        for (var i=0;i<global_atoms.length;i++){
+            atom_and_container_objects.push(global_atoms[i]);
         }
 
         if (parentheses_stack.length > 0){
