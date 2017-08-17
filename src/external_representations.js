@@ -7,35 +7,6 @@ if (is_node){
 }
 
 
-var scheme_test_print = function(a){
-    if (!a){
-        console.log("()");
-        return;
-    }
-    if (a.type == Zutsuki.TYPE_PAIR){
-        if (a.circle_flag){
-            console.log(" ( ... ) ");
-            return;
-        }
-
-        var p = a;
-        console.log("(");
-        while (p){
-            if (p && p.type != Zutsuki.TYPE_PAIR){
-                scheme_test_print(p);
-                break;
-            }
-            scheme_test_print(p.car);
-            p = p.cdr
-        }
-        console.log(")");
-    }else{
-        console.log("OBJCT>>",a);
-    }
-}
-
-
-
 
 Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
     const atom_and_container_objects = [];
@@ -199,7 +170,7 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
         if (parentheses_stack.length > 0){
             //括弧が閉じられていないケース
             if (is_repl_mode){
-            
+                return new Zutsuki.Reread(parentheses_stack,atom_and_container_objects);
             }else{
                 throw new Zutsuki.Error("missing close parentheses");
             }           
@@ -207,13 +178,7 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
         }
     }
 
-    console.log("");
-    console.log("");
-    console.log("");
-    for (var i=0;i<atom_and_container_objects.length;i++){
-        scheme_test_print(atom_and_container_objects[i]);
-    }
-    
+   
     return atom_and_container_objects;
 }
 
