@@ -8,8 +8,19 @@ if (is_node){
 
 
 
-Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
-    const atom_and_container_objects = [];
+Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode,acobjects,pstack){
+    var atom_and_container_objects = [];
+    var parentheses_stack = [];
+    if (acobjects){
+        atom_and_container_objects = acobjects;
+    }
+
+    if (pstack){
+        parentheses_stack = pstack;
+    }
+
+
+
     {
         //括弧を内部表現化する。
         const quote_symbol = new Zutsuki.Symbol("quote",-1,Zutsuki.GENERATED_TAG);
@@ -106,7 +117,6 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode){
 
 
 
-        const parentheses_stack = [];
         const end = input.length;
 
         var global_atoms = [];//括弧の外側のdatum labelを別で処理するためのコンテナ
