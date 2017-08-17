@@ -36,96 +36,78 @@ REAL ({SIGN}({UINTEGER}\.{UINTEGER}))|{INFNAN}
 %%
 
 (\ |\t) {
-    console.log("SP");
 }
 
 \n {
-    console.log("NL");
 }
 
 #\( {
-    console.log("VECTOR-LP");
     return "#(";
 }
 
 \( {
-    console.log("LP");   
     return "(";
 }
 
 \) {
-    console.log("RP");
     return ")";
 }
 
 \. {
-    console.log("DOT");   
     return ".";
 }
 
 
 \' {
-    console.log("QUOTE");
     return "'";
 }
 
 \` {
-    console.log("QQ");
     return "`";
 }
 
 ,@ {
-    console.log("UNQUOTE SPLICING");   
     return ",@";
 }
 
 , {
-    console.log("UNQUOTE");
     return ",";
 }
 
 
 {INTEGER} {
-    console.log("INTEGER",ztext,zline);
     return new Zutsuki.Number(ztext,Zutsuki.NUMBER_TYPE_UNSIGNED_INTEGER);
 }
 
 {REAL} {
-    console.log("INTEGER",ztext,zline);
     return new Zutsuki.Number(ztext,Zutsuki.NUMBER_TYPE_REAL);
 }
 
 
 {SYMBOL} {
-    console.log("SYMBOL",ztext,zline);   
     return new Zutsuki.Symbol(ztext,zline,ZLexer.filename);
 }
 
 {BOOLEAN} {
-    console.log("BOOLEAN",ztext,zline);
     return new Zutsuki.Boolean(ztext);
 }
 
 {CHAR} {
-    console.log("CHAR",ztext,zline);
     return new Zutsuki.Char(ztext);
 }
 
 {STRING} {
-    console.log("STRING",ztext,zline);
     return new Zutsuki.String(ztext.substr(1,ztext.length-2));
 }
 
 
 {COMMENT} {
-    console.log("COMMENT");
 }
 
 
 
 
 #{UINTEGER} {
-    console.log("DATUM LABEL",ztext);
     return new Zutsuki.Datum_label(parseInt(ztext.substr(1)));
 }
 
