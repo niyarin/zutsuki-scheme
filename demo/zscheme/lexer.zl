@@ -1,0 +1,122 @@
+%{
+    var is_node = typeof require !== "undefined";
+    if (is_node){
+        module.exports = ZLexer;
+        var Zutsuki = require("./zutsuki");
+    }
+    ZLexer.filename = "__filename__";
+%}
+
+
+%zoption zlib ZLexer
+
+
+SYMBOL ([a-zA-Z]|[0-9]|[-!$%&*+./:<=>?@^_~])+
+BOOLEAN #true|#false|#t|#f
+
+HEX_SCALAR_VALUE ([0-9]|[a-f])+
+CHARACTER_NAME alarm|backspace|delete|escape|newline|null|return|space|tab
+CHAR (#\\{CHARACTER_NAME}|#\\x{HEX_SCALAR_VALUE}|#\\.)
+
+STRING \".*?\"
+
+NORMAL_COMMENT ;.*\n
+NESTED_COMMENT #\|(.|\n)*\|#
+COMMENT ({NORMAL_COMMENT}|{NESTED_COMMENT})
+
+
+UINTEGER [0-9]+
+INFNAN \+inf\.0|-inf\.0|\+nan\.0|-nan\.0
+NUMBER {UINTEGER}
+SIGN (\+|-)?
+
+INTEGER {SIGN}{UINTEGER}
+REAL ({SIGN}({UINTEGER}\.{UINTEGER}))|{INFNAN}
+
+%%
+
+(\ |\t) {
+}
+
+\n {
+}
+
+#\( {
+    return "#(";
+}
+
+\( {
+    return "(";
+}
+
+\) {
+    return ")";
+}
+
+\. {
+    return ".";
+}
+
+
+\' {
+    return "'";
+}
+
+\` {
+    return "`";
+}
+
+,@ {
+    return ",@";
+}
+
+, {
+    return ",";
+}
+
+
+{INTEGER} {
+    return new Zutsuki.Number(ztext,Zutsuki.NUMBER_TYPE_UNSIGNED_INTEGER);
+}
+
+{REAL} {
+    return new Zutsuki.Number(ztext,Zutsuki.NUMBER_TYPE_REAL);
+}
+
+
+{SYMBOL} {
+    return new Zutsuki.Symbol(ztext,zline,ZLexer.filename);
+}
+
+{BOOLEAN} {
+    return new Zutsuki.Boolean(ztext);
+}
+
+{CHAR} {
+    return new Zutsuki.Char(ztext);
+}
+
+{STRING} {
+    return new Zutsuki.String(ztext.substr(1,ztext.length-2));
+}
+
+
+{COMMENT} {
+}
+
+
+
+
+#{UINTEGER} {
+    return new Zutsuki.Datum_label(parseInt(ztext.substr(1)));
+}
+
+# {
+    return "#";
+}
+
+
+%%
+
+
+

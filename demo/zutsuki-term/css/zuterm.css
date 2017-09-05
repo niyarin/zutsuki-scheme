@@ -1,0 +1,19 @@
+
+.zuterm {
+    background-color: #222222;
+    width:500px;
+    height:300px;
+    color:#EEEEEE;
+    padding-left:5px;
+    overflow: scroll;
+}
+
+.prompt {
+    color:#AAAAFF;
+    font-weight:bolder;
+}
+
+.error {
+    color:#FFAAAA;
+}
+

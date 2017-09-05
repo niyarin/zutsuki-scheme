@@ -1,0 +1,63 @@
+<!doctype html>
+
+<html>
+    <head>
+        <script src="zutsuki-term/js/zuterm.js"></script>
+        <link rel="stylesheet" href="zutsuki-term/css/zuterm.css"/>
+        <link rel="stylesheet" href="zutsuki-term/css/zuterm-demo.css"/>
+
+
+        <script src="zscheme/pachycephalo.js"></script>
+        <script src="zscheme/pachycephalo_procedures.js"></script>
+        <script src="zscheme/array_man.js"></script>
+        <script src="zscheme/expand.js"></script>
+        <script src="zscheme/external_representations.js"></script>
+        <script src="zscheme/interface.js"></script>
+        <script src="zscheme/lexer.js"></script>
+        <script src="zscheme/macro.js"></script>
+        <script src="zscheme/pachycephalo_code.js"></script>
+        <script src="zscheme/compile.js"></script>
+        <script src="zscheme/zutsuki.js"></script>
+
+    </head>
+
+    <body>
+        <div id="all">
+            <div id="head">
+                <h1>Zutsuki-Scheme </h1>
+            </div>
+            Zutsuki-SchemeはJavaScriptで書かれたScheme処理系です。<br><br><br>
+
+            <div class="zuterm" id="my-term"></div>
+        </div>
+
+
+        <script>
+            Zuterm.init();
+            var myterm = Zuterm.get_term_from_id("my-term");
+
+
+            var repl_obj = Interface.repl_create();
+            
+            myterm.input_fun = function(text,term){
+                var repl_res = repl_obj.input_fun(text);
+                for (var i=0;i<repl_res.length;i++){
+                    if (repl_res[i][0] == "set-prompt"){
+                        myterm.pt = repl_res[i][1];
+                    }else if (repl_res[i][0] == "res"){
+                        console.log(repl_res[i]);
+                        myterm.output_fun(repl_res[i][1]);
+                    }else if (repl_res[i][0] == "error"){
+                        myterm.error_fun(repl_res[i][1]);
+                    }else{
+                        console.log(repl_res[i]);
+                    }
+                }
+            }
+            console.log(repl_obj);
+            console.log(myterm);
+
+
+        </script>
+    </body>
+</html>
