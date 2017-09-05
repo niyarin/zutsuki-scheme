@@ -47,7 +47,12 @@ Interface.load_excode = function(name){
 }
 
 
-
+Interface.load_std_libs = function(){
+    var libs = ["zlib"];
+    for (var l in libs){
+        Interface.load_excode(l);
+    }
+}
 
 Interface.node_read_file = function(filename){
     var fs = require("fs");
@@ -148,25 +153,28 @@ Interface.node_export_code = function(input_file,output_file){
     if (exps == -1){
         return -1;
     }
+    
+    var libname = "";
+    for (var i=0;i<input_file.length;i++){
+        if (input_file[i] == "/"){
+            libname = "";
+            continue;
+        }else if (input_file[i] == "."){
+            break;
+        }
+        libname += input_file[i]
+    }
+
     {
 
         var array_man1 = [];
         var env1 = Expand.create_default_env();
      
 
-        ///*  
-        for (var i=0;i<exps.length;i++){
-            var a = Expand.expand(exps[i],env1);
-            array_man1.push(a);
-        }
-        //*/
-
-        /*
         try {
             for (var i=0;i<exps.length;i++){
                 var a = Expand.expand(exps[i],env1);
                 array_man1.push(a);
-                console.log("A",a);
             }
         }catch(e){
             if (typeof e == "object"){
@@ -177,7 +185,6 @@ Interface.node_export_code = function(input_file,output_file){
             }
             return -1;
         }
-        */
     }
     
     var array_man_data = Array_man.phase1(array_man1,env1,0);
@@ -220,7 +227,7 @@ Interface.node_export_code = function(input_file,output_file){
         }    
     }
 
-    var et = Pachycephalo_Code.export("test",compiled_code,compiled_const_code);
+    var et = Pachycephalo_Code.export(libname,compiled_code,compiled_const_code);
     if (!output_file){
         console.log(et); 
     }else{
@@ -533,11 +540,13 @@ Interface.Repl = function(){
     this.input_fun = null;
 }
 
+Interface.web_load_std_libs = function(){
+    Interface.exports.push(["zlib",Std_exlib.zlib]);
+}
+
 
 Interface.repl_create = function(){
     var res = new Interface.Repl();
-
-
 
     var env1 = Expand.create_default_env();
     var const_data = {0:0};
@@ -547,6 +556,9 @@ Interface.repl_create = function(){
     pachycephalo_env_a[2] = pachycephalo_env_a[0];
     var used_libraries = {};
     var reread = null;
+
+
+    Interface.web_load_std_libs();//標準外部ライブラリの読み込み
 
     res.input_fun = function(line){
         var exps = Interface.read_line(line + "\n",reread);
@@ -661,5 +673,7 @@ Interface.repl_create = function(){
 
         return [["set-prompt",">>> "],vmres];
     }
+
+    res.input_fun("(import (ex zlib)(zutsuki zero))");
     return res;
 }
