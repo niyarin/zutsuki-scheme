@@ -10,17 +10,6 @@ if (is_node){
 
 
 
-//
-//phase0
-//
-//lambda lbegin let lset! gset!
-//
-//phase1
-//
-//<phase0> + let2
-
-
-
 Array_man.P1_Inline = {};
 
 
