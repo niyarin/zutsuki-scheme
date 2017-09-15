@@ -10,17 +10,6 @@ if (is_node){
 
 
 
-//
-//phase0
-//
-//lambda lbegin let lset! gset!
-//
-//phase1
-//
-//<phase0> + let2
-
-
-
 Array_man.P1_Inline = {};
 
 
@@ -1023,8 +1012,11 @@ Array_man.convert_phase_2 = function(code,const_data,env,stack){
                         var first = code[1];
                         var second = code[2];
                         var res_exp = ["EQ2",first,second];
-                        for (var i=3;i<code.length;i++){
-                            res_exp = ["EQ2X",code[i],res_exp];
+                        if (code.length > 3){
+                            res_exp = ["EQ2X"];
+                            for (var i=1;i<code.length;i++){
+                                res_exp.push(code[i]);   
+                            }
                         }
                         return res_exp;
                      }

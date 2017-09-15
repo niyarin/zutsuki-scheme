@@ -319,7 +319,7 @@ Pachycephalo.VmCode.ADD2 = 111;
 Pachycephalo.VmCode.MUL2 = 112;
 Pachycephalo.VmCode.SUB2 = 113;
 Pachycephalo.VmCode.EQ2 = 114;
-Pachycephalo.VmCode.EQ2X = 114;
+Pachycephalo.VmCode.EQ2X = 115;
 
 
 
@@ -493,7 +493,7 @@ Pachycephalo.vm = function(code,enva){
                         cell = cell.cdr;
                     }
                 }
-                for (var i=0;i<last_res.length;i++){
+                for (var i=1;i<last_res.length;i++){
                    console.log(last_res[i]);
                 }
 
@@ -595,7 +595,14 @@ Pachycephalo.vm = function(code,enva){
                     for (var i=0;i<procedure.arg1_size;i++){
                         if (cell == Pachycephalo.NULL_OBJECT){
                             //error;
-                            error("error");
+                            error_code[1] = "ERROR:wrong number argument" + Pachycephalo.printer(procedure);
+                            error_code[2] = Pachycephalo.NULL_OBJECT;
+                            error_code[3] = code;
+                            error_code[4] = pos;
+                            code = error_code;
+                            pos = -1;
+                            break;
+
                         }
                         _local_cell[i] = cell.car;
                         if (procedure.type_check){
@@ -643,8 +650,15 @@ Pachycephalo.vm = function(code,enva){
 
 
                     if (!proc.arg2 && !(cell==Pachycephalo.NULL_OBJECT)){
-                        throw("unknown error");
+                            error_code[1] = "ERROR:wrong number argument" + Pachycephalo.printer(procedure);
+                            error_code[2] = Pachycephalo.NULL_OBJECT;
+                            error_code[3] = code;
+                            error_code[4] = pos;
+                            code = error_code;
+                            pos = -1;
+                            break;
                     }
+
                     _local_cell[proc.arg1_size] = cell;
                     //call_stack.push([code,pos,local_cell,local_env,procedure]);
                     call_stack = new Pachycephalo.Pair([code,pos,local_cell,local_env,procedure],call_stack);
@@ -1196,29 +1210,70 @@ Pachycephalo.vm = function(code,enva){
                 var a = stack.pop();
                 var b = stack.pop();
                 
-                if (a.type == Pachycephalo.TYPE_INTEGER && b.type == Pachycephalo.TYPE_INTEGER){
-                    stack.push(new Pachycephalo.Integer(a.number + b.number));
+                if (a.type == Pachycephalo.TYPE_INTEGER){
+                   if ( b.type == Pachycephalo.TYPE_INTEGER){
+                        stack.push(new Pachycephalo.Integer(a.number + b.number));
+                   }else if (b.type == Pachycephalo.TYPE_FLOAT){
+                        stack.push(new Pachycephalo.Float(a.number + b.number));
+                   }else{
+                        throw "SORRY";
+                   }
+                }else if (a.type == Pachycephalo.TYPE_FLOAT){
+                    if (b.type == Pachycephalo.TYPE_INTEGER || b.type == Pachycephalo.TYPE_FLOAT){
+                        stack.push(new Pachycephalo.Float(a.number + b.number));
+                    }else{
+                        throw "SORRY";
+                    }
                 }else{
-                    throw "NSORRY";
+                    throw "SORRY";
                 }
                 break;
             case Pachycephalo.VmCode.MUL2:
                 var a = stack.pop();
                 var b = stack.pop();
-                if (a.type == Pachycephalo.TYPE_INTEGER && b.type == Pachycephalo.TYPE_INTEGER){
-                    stack.push(new Pachycephalo.Integer(a.number * b.number));
+
+                if (a.type == Pachycephalo.TYPE_INTEGER){
+                   if ( b.type == Pachycephalo.TYPE_INTEGER){
+                        stack.push(new Pachycephalo.Integer(a.number * b.number));
+                   }else if (b.type == Pachycephalo.TYPE_FLOAT){
+                        stack.push(new Pachycephalo.Float(a.number * b.number));
+                   }else{
+                        throw "SORRY";
+                   }
+                }else if (a.type == Pachycephalo.TYPE_FLOAT){
+                    if (b.type == Pachycephalo.TYPE_INTEGER || b.type == Pachycephalo.TYPE_FLOAT){
+                        stack.push(new Pachycephalo.Float(a.number * b.number));
+                    }else{
+                        throw "SORRY";
+                    }
                 }else{
-                    throw "NSORRY";
+                    throw "SORRY";
                 }
+
                 break;
             case Pachycephalo.VmCode.SUB2:
                 var b = stack.pop();
                 var a = stack.pop();
-                if (a.type == Pachycephalo.TYPE_INTEGER && b.type == Pachycephalo.TYPE_INTEGER){
-                    stack.push(new Pachycephalo.Integer(a.number - b.number));
+
+                if (a.type == Pachycephalo.TYPE_INTEGER){
+                   if ( b.type == Pachycephalo.TYPE_INTEGER){
+                        stack.push(new Pachycephalo.Integer(a.number - b.number));
+                   }else if (b.type == Pachycephalo.TYPE_FLOAT){
+                        stack.push(new Pachycephalo.Float(a.number - b.number));
+                   }else{
+                        throw "SORRY";
+                   }
+                }else if (a.type == Pachycephalo.TYPE_FLOAT){
+                    if (b.type == Pachycephalo.TYPE_INTEGER || b.type == Pachycephalo.TYPE_FLOAT){
+                        stack.push(new Pachycephalo.Float(a.number - b.number));
+                    }else{
+                        throw "SORRY";
+                    }
                 }else{
-                    throw "NSORRY";
+                    throw "SORRY";
                 }
+
+                
                 break;
             case Pachycephalo.VmCode.EQ2:
                 var b = stack.pop();
@@ -1249,11 +1304,17 @@ Pachycephalo.vm = function(code,enva){
             case Pachycephalo.VmCode.EQ2X:
                 var b = stack.pop();
                 var a = stack.pop();
-                if (a.type == Pachycephalo.TYPE_INTEGER && b.type == Pachycephalo.TYPE_INTEGER){
+                var bl = stack.pop();
+                if (bl == Pachycephalo.FALSE_OBJECT){
+                    stack.push(Pachycephalo.FALSE_OBJECT);
+                    stack.push(a);
+                }else if (a.type == Pachycephalo.TYPE_INTEGER && b.type == Pachycephalo.TYPE_INTEGER){
                     if (a.number == b.number){
-                        stack.push(a.number);
+                        stack.push(Pachycephalo.TRUE_OBJECT);
+                        stack.push(a);
                     }else{
-                        throw "NSORRY";
+                        stack.push(Pachycephalo.FALSE_OBJECT);
+                        stack.push(Pachycephalo.FALSE_OBJECT);
                     }
                 }else{
                     throw "NSORRY";

@@ -190,9 +190,23 @@ Compile.compile_loop = function(code,env,ret,tail){
             Compile.compile_loop(code[2],env,ret,0);
             ret.push(VMCODE.EQ2);
         }else if (opecode == "EQ2X"){
+            ret.push(VMCODE.PUSH_TRUE);
             Compile.compile_loop(code[1],env,ret,0);
             Compile.compile_loop(code[2],env,ret,0);
-            ret.push(VMCODE.EQ2X);           
+            ret.push(VMCODE.EQ2X); 
+            for (var i=3;i<code.length;i++){
+                Compile.compile_loop(code[i],env,ret,0);
+                ret.push(VMCODE.EQ2X);     
+            }
+            ret.push(VMCODE.POP);
+        }else if (opecode == "call-with-values"){
+            ret.push(VMCODE.PUSH_NULL);
+            Compile.compile_loop(code[1],env,ret,0);
+            ret.push(VMCODE.CALL);
+            ret.push(VMCODE.RECEIVE);
+            ret.push(VMCODE.CONS);
+            Compile.compile_loop(code[2],env,ret,0);
+            ret.push(VMCODE.CALL);
         }else if (opecode == "built_in"){
             exit(111);
         }else if (opecode == "define"){
