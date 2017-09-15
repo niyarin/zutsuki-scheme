@@ -1,6 +1,6 @@
 Zutsuki = {};
 
-const is_node = typeof require !== "undefined";
+var is_node = typeof require !== "undefined";
 if (is_node){
     module.exports = Zutsuki;
 }
@@ -27,6 +27,7 @@ Zutsuki.TYPE_CONST_VARIABLE = 101;
 Zutsuki.TYPE_INLINE_FUNCTION = 102;
 Zutsuki.TYPE_RENAMED_SYMBOL = 103;
 
+Zutsuki.TYPE_REREAD = 200;
 
 
 
@@ -128,6 +129,13 @@ Zutsuki.Error = function(message,file,line){
     this.code = null;
     this.file = file;
     this.line = line;
+}
+
+Zutsuki.Reread = function(parentheses_stack,atom_and_container_objects ){
+    this.type = Zutsuki.TYPE_REREAD;
+    this.atom_and_container_objects = atom_and_container_objects;
+    this.parentheses_stack = parentheses_stack;
+
 }
 
 
