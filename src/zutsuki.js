@@ -20,11 +20,14 @@ Zutsuki.TYPE_SYNTAX = 10;
 Zutsuki.TYPE_ERROR = 11;
 
 Zutsuki.NUMBER_TYPE_UNSIGNED_INTEGER = 1;
+Zutsuki.NUMBER_TYPE_REAL = 2;
 
 Zutsuki.TYPE_DATUM_LABEL = 100;
 Zutsuki.TYPE_CONST_VARIABLE = 101;
 Zutsuki.TYPE_INLINE_FUNCTION = 102;
 Zutsuki.TYPE_RENAMED_SYMBOL = 103;
+
+
 
 
 Zutsuki.ERROR = {"reason":""};
@@ -43,8 +46,16 @@ Zutsuki.Symbol = function(data,line,filename){
 
 Zutsuki.RenamedSymbol = function(data){
     this.type = Zutsuki.TYPE_RENAMED_SYMBOL;
-    this.data = data;
     this.org = data;
+    
+    this.global = null;
+    this.local = null;
+
+    this.rename_flag = false;
+
+    this.data = null;
+    this.line = -1;
+    this.filename = null;
 }
 
 
@@ -102,9 +113,10 @@ Zutsuki.Const_variable = function(data){
     this.data = data;
 }
 
-Zutsuki.Inline_function = function(data){
-  this.type = Zutsuki.TYPE_INLINE_FUNCTION;
-  this.data = data;
+Zutsuki.Inline_function = function(data,const_sym){
+    this.type = Zutsuki.TYPE_INLINE_FUNCTION;
+    this.data = data;
+    this.const_sym = const_sym;//呼び出し位置ではない場合使う
 }
 
 
@@ -134,6 +146,25 @@ Zutsuki.TRUE = function(data){
 Zutsuki.FALSE = function(data){
     return new Zutsuki.Boolean("#f");
 }
+
+
+//jaarrayから再帰的にzutsuki-listに変換する
+Zutsuki.gencode = function(jsarray){
+    if (Array.isArray(jsarray)){
+        var cell =  Zutsuki.ZP(null,null);
+        var top_cell =cell;
+        for (var i=0;i<jsarray.length;i++){
+            cell.cdr = Zutsuki.ZP(Zutsuki.gencode(jsarray[i]),null);
+            cell = cell.cdr;
+        }
+        return top_cell.cdr;
+    }else if (typeof jsarray == "string"){
+        return Zutsuki.SYM(jsarray);
+    }else{
+        return jsarray;
+    }
+}
+
 
 
 
@@ -231,7 +262,10 @@ Zutsuki.printer = function(obj){
                         res += loop(cell,looked);
                         break;
                     }
-                    res += " " + loop(cell.car,looked);
+                    res += loop(cell.car,looked);
+                    if (cell && cell.cdr){
+                        res += " ";
+                    }
                     cell = cell.cdr;
                 }
                 res += ")";
@@ -240,9 +274,17 @@ Zutsuki.printer = function(obj){
         }else if (o.type == Zutsuki.TYPE_SYMBOL){
             return o.data;
         }else if (o.type == Zutsuki.TYPE_RENAMED_SYMBOL){
-            return "<RENAME_" + o.data.data + ">";
+            return "<RENAME_" + o.org.data + ">";
         }else if (o.type == Zutsuki.TYPE_NUMBER){
             return o.data;
+        }else if (o.type == Zutsuki.TYPE_SYNTAX){
+            return "<syntax " + o.syntax_name + ">";
+        }else if (o.type == Zutsuki.TYPE_BOOLEAN){
+            if (o.data){
+                return "#t"
+            }else{
+                return "#f"
+            }
         }else{
             return "<?OBJECT>";
         }
@@ -278,3 +320,13 @@ Zutsuki.zerror2string = function(zerr){
 }
 
 
+Zutsuki.renamed_symbol2symbol = function(renamed_symbol,new_symbol){
+    if (!new_symbol && new_symbol!=""){
+        new_symbol = renamed_symbol.org.data;
+    }
+    renamed_symbol.data = new_symbol;
+    renamed_symbol.line = renamed_symbol.org.line;
+    renamed_symbol.filename = renamed_symbol.org.filename;
+    renamed_symbol.type = Zutsuki.TYPE_SYMBOL;
+    return renamed_symbol;
+}
