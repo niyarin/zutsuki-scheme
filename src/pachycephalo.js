@@ -319,7 +319,7 @@ Pachycephalo.VmCode.ADD2 = 111;
 Pachycephalo.VmCode.MUL2 = 112;
 Pachycephalo.VmCode.SUB2 = 113;
 Pachycephalo.VmCode.EQ2 = 114;
-Pachycephalo.VmCode.EQ2X = 114;
+Pachycephalo.VmCode.EQ2X = 115;
 
 
 
@@ -1304,11 +1304,17 @@ Pachycephalo.vm = function(code,enva){
             case Pachycephalo.VmCode.EQ2X:
                 var b = stack.pop();
                 var a = stack.pop();
-                if (a.type == Pachycephalo.TYPE_INTEGER && b.type == Pachycephalo.TYPE_INTEGER){
+                var bl = stack.pop();
+                if (bl == Pachycephalo.FALSE_OBJECT){
+                    stack.push(Pachycephalo.FALSE_OBJECT);
+                    stack.push(a);
+                }else if (a.type == Pachycephalo.TYPE_INTEGER && b.type == Pachycephalo.TYPE_INTEGER){
                     if (a.number == b.number){
-                        stack.push(a.number);
+                        stack.push(Pachycephalo.TRUE_OBJECT);
+                        stack.push(a);
                     }else{
-                        throw "NSORRY";
+                        stack.push(Pachycephalo.FALSE_OBJECT);
+                        stack.push(Pachycephalo.FALSE_OBJECT);
                     }
                 }else{
                     throw "NSORRY";
