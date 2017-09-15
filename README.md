@@ -4,4 +4,4 @@ zutsuki-schemeは、JavaScriptで書かれたR7RS準拠を目標にしているS
 
 ## デモページ
 
-<a href="http://niyarin.github.io/zutsuki-scheme/demo/">こちら</a>
+<a href="niyarin.github.io/zutsuki-scheme/">こちら</a>
