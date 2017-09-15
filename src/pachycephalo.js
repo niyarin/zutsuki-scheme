@@ -1210,29 +1210,70 @@ Pachycephalo.vm = function(code,enva){
                 var a = stack.pop();
                 var b = stack.pop();
                 
-                if (a.type == Pachycephalo.TYPE_INTEGER && b.type == Pachycephalo.TYPE_INTEGER){
-                    stack.push(new Pachycephalo.Integer(a.number + b.number));
+                if (a.type == Pachycephalo.TYPE_INTEGER){
+                   if ( b.type == Pachycephalo.TYPE_INTEGER){
+                        stack.push(new Pachycephalo.Integer(a.number + b.number));
+                   }else if (b.type == Pachycephalo.TYPE_FLOAT){
+                        stack.push(new Pachycephalo.Float(a.number + b.number));
+                   }else{
+                        throw "SORRY";
+                   }
+                }else if (a.type == Pachycephalo.TYPE_FLOAT){
+                    if (b.type == Pachycephalo.TYPE_INTEGER || b.type == Pachycephalo.TYPE_FLOAT){
+                        stack.push(new Pachycephalo.Float(a.number + b.number));
+                    }else{
+                        throw "SORRY";
+                    }
                 }else{
-                    throw "NSORRY";
+                    throw "SORRY";
                 }
                 break;
             case Pachycephalo.VmCode.MUL2:
                 var a = stack.pop();
                 var b = stack.pop();
-                if (a.type == Pachycephalo.TYPE_INTEGER && b.type == Pachycephalo.TYPE_INTEGER){
-                    stack.push(new Pachycephalo.Integer(a.number * b.number));
+
+                if (a.type == Pachycephalo.TYPE_INTEGER){
+                   if ( b.type == Pachycephalo.TYPE_INTEGER){
+                        stack.push(new Pachycephalo.Integer(a.number * b.number));
+                   }else if (b.type == Pachycephalo.TYPE_FLOAT){
+                        stack.push(new Pachycephalo.Float(a.number * b.number));
+                   }else{
+                        throw "SORRY";
+                   }
+                }else if (a.type == Pachycephalo.TYPE_FLOAT){
+                    if (b.type == Pachycephalo.TYPE_INTEGER || b.type == Pachycephalo.TYPE_FLOAT){
+                        stack.push(new Pachycephalo.Float(a.number * b.number));
+                    }else{
+                        throw "SORRY";
+                    }
                 }else{
-                    throw "NSORRY";
+                    throw "SORRY";
                 }
+
                 break;
             case Pachycephalo.VmCode.SUB2:
                 var b = stack.pop();
                 var a = stack.pop();
-                if (a.type == Pachycephalo.TYPE_INTEGER && b.type == Pachycephalo.TYPE_INTEGER){
-                    stack.push(new Pachycephalo.Integer(a.number - b.number));
+
+                if (a.type == Pachycephalo.TYPE_INTEGER){
+                   if ( b.type == Pachycephalo.TYPE_INTEGER){
+                        stack.push(new Pachycephalo.Integer(a.number - b.number));
+                   }else if (b.type == Pachycephalo.TYPE_FLOAT){
+                        stack.push(new Pachycephalo.Float(a.number - b.number));
+                   }else{
+                        throw "SORRY";
+                   }
+                }else if (a.type == Pachycephalo.TYPE_FLOAT){
+                    if (b.type == Pachycephalo.TYPE_INTEGER || b.type == Pachycephalo.TYPE_FLOAT){
+                        stack.push(new Pachycephalo.Float(a.number - b.number));
+                    }else{
+                        throw "SORRY";
+                    }
                 }else{
-                    throw "NSORRY";
+                    throw "SORRY";
                 }
+
+                
                 break;
             case Pachycephalo.VmCode.EQ2:
                 var b = stack.pop();
