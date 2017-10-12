@@ -27,6 +27,14 @@
       ((null? ls) (error "index error @<procedure list-set!>"))
       (else (loop (- i 1)(cdr ls))))))
 
+(define (list-ref list k)
+  (let loop ((i k)(res list))
+    (cond 
+      ((not (pair? res)) (error "pair required @<procedure list-ref>"))
+      ((zero? i) (car res))
+      (else (loop (- i 1) (cdr res))))))
+
+
 
 
 (define (member obj list . opt)
@@ -74,6 +82,7 @@
 
 
 
+;number
 
-
-
+(define (zero? n) 
+  (= n 0))
