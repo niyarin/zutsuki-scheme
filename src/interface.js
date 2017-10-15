@@ -243,19 +243,17 @@ Interface.node_run_from_file2 = function(filename){
         var env1 = Expand.create_default_env();
      
 
-        ///*  
+        /*  
         for (var i=0;i<exps.length;i++){
             var a = Expand.expand(exps[i],env1);
             array_man1.push(a);
         }
-        //*/
+        */
 
-        /*
         try {
             for (var i=0;i<exps.length;i++){
                 var a = Expand.expand(exps[i],env1);
                 array_man1.push(a);
-                console.log("A",a);
             }
         }catch(e){
             if (typeof e == "object"){
@@ -266,7 +264,6 @@ Interface.node_run_from_file2 = function(filename){
             }
             return -1;
         }
-        */
     }
     
     var array_man_data = Array_man.phase1(array_man1,env1,0);
