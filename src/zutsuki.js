@@ -308,9 +308,8 @@ Zutsuki.zerror2string = function(zerr){
     }
 
     var res = zerr.message;
-    if (zerr.line && zerr.line > 1){
+    if (zerr.line && zerr.line != -1){
         res += "  @[" + zerr.file + " " + zerr.line + "]";
-
     }
     if (zerr.code){
         res += ":   " + Zutsuki.printer(zerr.code);
