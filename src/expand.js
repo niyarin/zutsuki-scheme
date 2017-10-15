@@ -726,7 +726,6 @@ Expand.Syntax.Let_star = function(){
 
         var res = null;
 
-
         if (!bindings.cdr){
             res = Zutsuki.ZP(env.core["let"],Zutsuki.ZP(bindings,bodies));
         }else if (bindings){
@@ -739,7 +738,20 @@ Expand.Syntax.Let_star = function(){
             res = Zutsuki.ZP(env.core["let"],
                 Zutsuki.ZP(null,bodies));
         }
-        return Expand.expand(res,env);
+
+
+
+        try{
+            return Expand.expand(res,env);
+        }catch(e){
+            if (e && typeof e == "object" && e.type == Zutsuki.TYPE_ERROR){
+                e.error_stack.push(Zutsuki.generate_error_with_hint_object("conv let* to let",res));
+                e.error_stack.push(Zutsuki.generate_error_with_hint_object("from",code));
+                e.filename = null;
+                e.line = -1;
+            }
+            throw e;
+        }
     }
 }
 
