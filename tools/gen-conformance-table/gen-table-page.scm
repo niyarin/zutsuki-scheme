@@ -7,6 +7,7 @@
 
 
 (define html-head "
+  <head><meta charset=\"utf-8\"/></head>
 <style>
 table {
         border-collapse: collapse;
