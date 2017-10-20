@@ -1006,13 +1006,18 @@ Expand.Syntax.Define = function(){
             throw Zutsuki.generate_error_with_hint_object("syntax error",code);
         }
 
+       
         if (Expand.is_local_environment(env)){
             Expand.push_local_define(env.last_let,variable);
             Expand.check_assignment(variable,env);//追加
             return ["lset!",variable,body];
         }
+
         if (!Expand.check_assignment(variable,env)){
+            //ここが実行されるのは必ずglobal
+            env.global[variable] = new Zutsuki.User_procedure(variable);
         }
+
         return ["define",variable,body];
     }
     /*
