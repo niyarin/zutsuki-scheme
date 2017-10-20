@@ -244,9 +244,11 @@ Expand.check_assignment = function(symbol,env){
     }
 
     const tgt = env.global[symbol];
-    if (tgt == Expand.BUILT_IN_FUNCTION){
+    //if (tgt == Expand.BUILT_IN_FUNCTION){
+    if (tgt){
         //importで読み込まれたシンボルに破壊的変更を加えることはエラー
         env.global[symbol] = Expand.UNDEFINED_OBJECT;
+        return 1;
     }
     return 0;
 }
@@ -1009,7 +1011,8 @@ Expand.Syntax.Define = function(){
             Expand.check_assignment(variable,env);//追加
             return ["lset!",variable,body];
         }
-        Expand.check_assignment(variable,env);
+        if (!Expand.check_assignment(variable,env)){
+        }
         return ["define",variable,body];
     }
     /*
