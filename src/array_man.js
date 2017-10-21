@@ -37,7 +37,6 @@ Array_man.P1_Inline.inlining = function(fbody,fcell){
         }else{
             ret = fbody;
         }
-    
     }
     return ret;
 }
@@ -62,6 +61,44 @@ Array_man.P1_Inline.is_inline_function = function(f){
 }
 
 
+
+Array_man.P1_Inline.is_global_inline_function = function(f,name){
+    
+    //構文にかかわらずトップ部分がnameになっているか判定する
+    var maybe_recursive = false;
+    
+    function loop(code,nest){
+        if (nest > 7){
+            return 100;
+        }
+
+        if (Array.isArray(code)){
+            if (code.length > 10){
+                return 100;
+            }
+
+
+            if (code[0] == name){
+                maybe_recursive = true;
+            }
+
+            var res = 0;
+            for (var i=0;i<code.length;i++){
+                res += loop(code[i],nest+1);
+            }
+            return res + 1;
+        }
+        return 1;
+    }
+
+    if (loop(f[3],0) < 20){
+        if (maybe_recursive){
+            return -1;
+        }
+        return 1;
+    }
+    return 0;
+}
 
 
 Array_man.phase_1_is_beta_object = function(object,const_data){
@@ -390,6 +427,24 @@ Array_man.convert_phase_1 = function(array_man_code1,const_data,global,stack){
                 }
             }
             array_man_code1[2] = Array_man.convert_phase_1(array_man_code1[2],const_data,global,stack);
+            return array_man_code1;
+        }else if (opecode == "define"){
+            array_man_code1[2] = Array_man.convert_phase_1(array_man_code1[2],const_data,global,stack);
+            var body = array_man_code1[2];
+            if (body && !Array.isArray(body) && body.type == Zutsuki.TYPE_CONST_VARIABLE){
+                var tgt = global[array_man_code1[1]];
+                if (tgt && tgt.type == Zutsuki.TYPE_USER_PROCEDURE){
+                    var f = const_data[body.data]
+                    var inline_ptn = Array_man.P1_Inline.is_global_inline_function(f,array_man_code1[1]);
+                    if (inline_ptn == 1){
+                        tgt.const_id = body.data;
+                    }else if (inline_ptn == -1){
+                        global[array_man_code1[1]] = Expand.UNDEFINED_OBJECT;
+                    }else{
+                        global[array_man_code1[1]] = Expand.UNDEFINED_OBJECT;
+                    }
+                }
+            }
             return array_man_code1;
         }else if (opecode == "if"){
             for (var i=1;i<array_man_code1.length;i++){
@@ -884,6 +939,20 @@ Array_man.convert_phase_2 = function(code,const_data,env,stack){
             return new Zutsuki.Const_variable(qname);
         }
 
+
+
+        if (code[0].type == Zutsuki.TYPE_SYMBOL){
+            var opecode = Array_man.convert_phase_2(code[0],const_data,env,stack);
+            if (Array.isArray(opecode) && opecode[0] == "global"){
+                const global_ref = env[code[0].data];
+                if (global_ref && global_ref.type == Zutsuki.TYPE_USER_PROCEDURE){
+                    if (global_ref.const_id != -1 && !global_ref.is_recursive){
+                    }
+                }
+            }
+        }
+
+
         for (var i=1;i<code.length;i++){
             code[i] = Array_man.convert_phase_2(code[i],const_data,env,stack);
         }
@@ -1045,6 +1114,8 @@ Array_man.convert_phase_2 = function(code,const_data,env,stack){
                 return ["built_in",code.data];
             }
             */
+
+  
 
             return ["global",code];
         }
