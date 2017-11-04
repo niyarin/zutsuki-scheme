@@ -530,11 +530,13 @@ Interface.Repl = function(){
     this.input_fun = null;
 }
 
+Interface.web_load_std_libs = function(){
+    Interface.exports.push(["zlib",Std_exlib.zlib]);
+}
+
 
 Interface.repl_create = function(){
     var res = new Interface.Repl();
-
-
 
     var env1 = Expand.create_default_env();
     var const_data = {0:0};
@@ -544,6 +546,9 @@ Interface.repl_create = function(){
     pachycephalo_env_a[2] = pachycephalo_env_a[0];
     var used_libraries = {};
     var reread = null;
+
+
+    Interface.web_load_std_libs();//標準外部ライブラリの読み込み
 
     res.input_fun = function(line){
         var exps = Interface.read_line(line + "\n",reread);
@@ -658,5 +663,7 @@ Interface.repl_create = function(){
 
         return [["set-prompt",">>> "],vmres];
     }
+
+    res.input_fun("(import (ex zlib)(zutsuki zero))");
     return res;
 }
