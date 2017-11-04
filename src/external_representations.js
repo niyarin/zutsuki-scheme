@@ -1,6 +1,6 @@
-const Exr = {};
+var Exr = {};
 
-const is_node = typeof require !== "undefined";
+var is_node = typeof require !== "undefined";
 if (is_node){
     module.exports = Exr;
     const Zutsuki = require("./zutsuki");
