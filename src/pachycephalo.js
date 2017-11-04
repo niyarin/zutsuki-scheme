@@ -1379,6 +1379,8 @@ Pachycephalo.printer = function(obj){
             return res;
         }else if (o.type == Pachycephalo.TYPE_JS_PROC1){
             return "<procedure " + o.name + " >";
+        }else if (o.type == Pachycephalo.TYPE_SPECIAL_PROCEDURE){
+            return "<procedure>";
         }else if (o.type == Pachycephalo.TYPE_CLOSURE){
             var res = "#<closure:arg= ";
             for (var i=0;i<o.procedure.arg1.length;i++){
