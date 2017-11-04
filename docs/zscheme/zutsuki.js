@@ -26,7 +26,7 @@ Zutsuki.TYPE_DATUM_LABEL = 100;
 Zutsuki.TYPE_CONST_VARIABLE = 101;
 Zutsuki.TYPE_INLINE_FUNCTION = 102;
 Zutsuki.TYPE_RENAMED_SYMBOL = 103;
-
+Zutsuki.TYPE_USER_PROCEDURE = 104;
 Zutsuki.TYPE_REREAD = 200;
 
 
@@ -118,6 +118,13 @@ Zutsuki.Inline_function = function(data,const_sym){
     this.type = Zutsuki.TYPE_INLINE_FUNCTION;
     this.data = data;
     this.const_sym = const_sym;//呼び出し位置ではない場合使う
+}
+
+Zutsuki.User_procedure = function(name){
+    this.type = Zutsuki.TYPE_USER_PROCEDURE;
+    this.name = name;
+    this.const_id = -1;
+    this.is_recursive = false;
 }
 
 
@@ -308,9 +315,8 @@ Zutsuki.zerror2string = function(zerr){
     }
 
     var res = zerr.message;
-    if (zerr.line && zerr.line > 1){
+    if (zerr.line && zerr.line != -1){
         res += "  @[" + zerr.file + " " + zerr.line + "]";
-
     }
     if (zerr.code){
         res += ":   " + Zutsuki.printer(zerr.code);

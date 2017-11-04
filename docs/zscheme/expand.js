@@ -99,6 +99,8 @@ Expand.set_zutsuki_one = function(env){
     env.global["when"] = new Expand.Syntax.When();
     env.global["unless"] = new Expand.Syntax.Unless();
 
+    env.global["let-values"] = new Expand.Syntax.Let_values();
+
 }
 
 
@@ -153,6 +155,9 @@ Expand.core_environment = function(){
     ret["cond"] = new Expand.Syntax.Cond();
     ret["and"] = new Expand.Syntax.And();
     ret["or"] = new Expand.Syntax.Or();
+
+
+    ret["let-values"] = new Expand.Syntax.Let_values();
     return ret;
 }
 
@@ -239,9 +244,11 @@ Expand.check_assignment = function(symbol,env){
     }
 
     const tgt = env.global[symbol];
-    if (tgt == Expand.BUILT_IN_FUNCTION){
+    //if (tgt == Expand.BUILT_IN_FUNCTION){
+    if (tgt){
         //importで読み込まれたシンボルに破壊的変更を加えることはエラー
         env.global[symbol] = Expand.UNDEFINED_OBJECT;
+        return 1;
     }
     return 0;
 }
@@ -721,7 +728,6 @@ Expand.Syntax.Let_star = function(){
 
         var res = null;
 
-
         if (!bindings.cdr){
             res = Zutsuki.ZP(env.core["let"],Zutsuki.ZP(bindings,bodies));
         }else if (bindings){
@@ -734,7 +740,20 @@ Expand.Syntax.Let_star = function(){
             res = Zutsuki.ZP(env.core["let"],
                 Zutsuki.ZP(null,bodies));
         }
-        return Expand.expand(res,env);
+
+
+
+        try{
+            return Expand.expand(res,env);
+        }catch(e){
+            if (e && typeof e == "object" && e.type == Zutsuki.TYPE_ERROR){
+                e.error_stack.push(Zutsuki.generate_error_with_hint_object("conv let* to let",res));
+                e.error_stack.push(Zutsuki.generate_error_with_hint_object("from",code));
+                e.filename = null;
+                e.line = -1;
+            }
+            throw e;
+        }
     }
 }
 
@@ -987,12 +1006,18 @@ Expand.Syntax.Define = function(){
             throw Zutsuki.generate_error_with_hint_object("syntax error",code);
         }
 
+       
         if (Expand.is_local_environment(env)){
             Expand.push_local_define(env.last_let,variable);
             Expand.check_assignment(variable,env);//追加
             return ["lset!",variable,body];
         }
-        Expand.check_assignment(variable,env);
+
+        if (!Expand.check_assignment(variable,env)){
+            //ここが実行されるのは必ずglobal
+            env.global[variable] = new Zutsuki.User_procedure(variable);
+        }
+
         return ["define",variable,body];
     }
     /*
@@ -1023,7 +1048,7 @@ Expand.Syntax.Let_syntax = function(){
     this.syntax_name = "let-syntax";
     this.type = Zutsuki.TYPE_SYNTAX;
     this.check = function(code){
-        
+        return false;   
     }
     this.convert = function(code,env){
         var bindings = [];
@@ -1058,6 +1083,39 @@ Expand.Syntax.Let_syntax = function(){
     }
 }
 
+Expand.Syntax.Let_values = function(){
+    this.syntax_name = "let-values";
+    this.type = Zutsuki.TYPE_SYNTAX;
+    this.check = function(code){
+        return false;   
+    }
+    this.convert = function(code,env){
+        var bodies = code.cdr.cdr;
+        var bindings = code.cdr.car;
+        
+        if (!bindings){
+            return Expand.expand(Zutsuki.ZP(new Zutsuki.Symbol("begin"),bodies),env);
+        }else{
+            var top_bind_args = bindings.car.car;
+            var top_bind_body = bindings.car.cdr.car;
+
+            var res = ["call-with-values"];
+            var res1 = Expand.expand(Zutsuki.gencode(["lambda",[],top_bind_body]),env);
+            var res2 = null;
+            if (bindings.cdr){
+                res2 = Expand.expand(Zutsuki.gencode(["lambda",top_bind_args,[env.core["let-values"],bindings.cdr,Zutsuki.ZP(new Zutsuki.Symbol("begin"),bodies)]]),env);
+            }else{
+                res2 = Expand.expand(Zutsuki.gencode(["lambda",top_bind_args,Zutsuki.ZP(new Zutsuki.Symbol("begin"),bodies)]),env);
+            }
+            res.push(res1);
+            res.push(res2);
+            return res;
+        }
+    }
+}
+
+
+
 
 Expand.Syntax.Syntax_rules = function(){
     this.syntax_name = "syntax-rules";
@@ -1082,6 +1140,9 @@ Expand.Syntax.If = function(){
     this.syntax_name = "if";
     this.type = Zutsuki.TYPE_SYNTAX;
     this.check = function(code){
+        if (Expand.check_proper_list(code)<=2){
+            return Expand.syntax_error("if",code,"?");
+        }
         return false;
     }
 

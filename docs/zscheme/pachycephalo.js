@@ -197,6 +197,7 @@ Pachycephalo.set_pachycephalo_zero = function(env){
     var core0 = Pachycephalo_Procejures.core0();
     var list1 = Pachycephalo_Procejures.list_library1();
     var compare = Pachycephalo_Procejures.compare_library();
+    var number = Pachycephalo_Procejures.number_library();
     
     env.global["call/cc"] = Pachycephalo.BUILT_IN_CALL_CC;
     env.global["call-with-current-continuation"] = Pachycephalo.BUILT_IN_CALL_CC;
@@ -224,6 +225,10 @@ Pachycephalo.set_pachycephalo_zero = function(env){
     env.global["eqv?"] = compare["eqv?"];
     env.global["eq?"] = compare["eq?"];
     env.global["equal?"] = compare["equal?"];
+
+
+    env.global["integer?"] = number["integer?"];
+
 
     env.global["apply1"] = core0["apply1"];
 }

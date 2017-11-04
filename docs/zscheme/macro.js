@@ -55,8 +55,6 @@ Macro.check_template = function(template,ellipsis,pattern_vars){
         }
 
         if (template.type == Zutsuki.TYPE_PAIR){
-            console.log("TEMPLATE_CHECK::PAIR");
-            console.log(template);
             var cell = template;
             while (cell){
                 if (cell.type != Zutsuki.TYPE_PAIR){
@@ -90,7 +88,6 @@ Macro.check_template = function(template,ellipsis,pattern_vars){
 
     const data = [];
     loop(template,data,[],0);
-    console.log("!",data,pattern_vars);
     return data;
 }
 
@@ -142,14 +139,12 @@ Macro.pattern_convert = function(pattern,ellipsis,literals,pattern_symbols){
             return ret;
         }else if (eflag == true && dot_flag == false){
             //パターン2(真正可変長リスト)
-            console.log("2",ret);
             tmp_left.unshift(2);
             tmp_left.unshift(Zutsuki.TYPE_PAIR);
             tmp_left.push(ret);
             ret = tmp_left;
             return ret;
         }else if (eflag == false && dot_flag == true){
-            console.log("2");
             return ret;
         }else if (eflag == true && dot_flag == true){
             //パターン4(非真正可変長リスト)
@@ -245,7 +240,6 @@ Macro.pattern_visualizar = function(rule){
         }else if (rule[0] == Zutsuki.TYPE_VECTOR){
             return "<VECTOR>";
         }else{
-            console.log("ELSE=",rule);
             exit();
         }
     }
@@ -292,7 +286,6 @@ Macro.create_syntax_rules = function(code){
 
     cell = rules;
 
-    console.log("MACRO",cell);
     
     var syntax_list = [];
     while (cell){
@@ -311,7 +304,6 @@ Macro.create_syntax_rules = function(code){
         cell = cell.cdr;
     }
 
-    console.log("SYNTAX-LIST",syntax_list);
     return [ellipsis_symbol,syntax_list];
 }
 
@@ -328,21 +320,16 @@ Macro.Ellipsis_tree = function(type){
     
     this.push = function(nest,code,graph,shape_stack){
         if (!this.last_shape_stack){
-            console.log("NEST=",nest);
             for (var i=1;i<nest+1;i++){
                 graph.push([i+1]);
                 this.position.push(i);
             }
-            console.log("p",this.position);
             graph.push(code);
         }else{
             var id = -1;
-            console.log(shape_stack,this.last_shape_stack);
-            console.log("PREV POS",this.position,code);
             for (var i=0;i<shape_stack.length;i++){
                 if (this.last_shape_stack[i] != shape_stack[i]){
                     if (i != nest-1){
-                        console.log("I=",i);
                         var pid = this.position[i];
                         for (var j=i;j<nest;j++){
                             id = graph.length;
@@ -357,18 +344,15 @@ Macro.Ellipsis_tree = function(type){
                     break;
                 }
             }
-            console.log("AFTER POSITION",this.position);
 
             if (id == -1){
                 var pid = this.position[this.position.length - 1];
                 var id = graph.length;
-                console.log("PID=",pid,graph[pid],this.position,code);
                 graph[pid].push(id);
                 graph.push(id);
             }
             graph[id] = code;
 
-            console.log(this.position);
         }
 
         this.last_shape_stack = [];
@@ -423,7 +407,6 @@ Macro.Expand_tree = function(){
             exit(1);
         }
 
-        console.log("GRAPH=",graph);
         exit(1);
     
     }
@@ -452,7 +435,6 @@ Macro.match_proper_list= function(arr,list){
 
 
 Macro.push_null = function(rule,env){
-    console.log(rule);
     if (rule[0] == Zutsuki.TYPE_PAIR){
         if (rule[1] == 1){
             for (var i=0;i<rule[2].length;i++){
@@ -484,17 +466,11 @@ Macro.push_null = function(rule,env){
 
 
 Macro.match = function(code,rule,env,nest){
-    console.log("");
-    console.log("code=");
     scheme_test_print(code);
-    console.log("rule=",Macro.pattern_visualizar(rule));
     if (rule[0] == Zutsuki.TYPE_PAIR){
-        console.log("rule[0] is PAIR");
         if (code == null){
-            console.log("CODE IS NULL");
             if (nest > 0){
                 Macro.push_null(rule,env);
-                console.log("nul",env);
                 exit(1);
             }else{
                 return false;
@@ -506,7 +482,6 @@ Macro.match = function(code,rule,env,nest){
             //長さが足りなかったか、非真正リストだったかのどちらか。
             return false;
         }
-        console.log("TOP-MATCH OK!");
 
 
         for (var i=0;i<top_match[1].length;i++){
@@ -515,21 +490,16 @@ Macro.match = function(code,rule,env,nest){
             }
         }
         
-        console.log("PATARN MATCHING PTN=",rule[1]);
         var pair_matching_pattern = rule[1];
         if (pair_matching_pattern == 1){
             if (!top_match[0]){ 
                 //↑ 末尾cellがnull
-                console.log("MATCH-PTN1-OK");
                 return true;
             }
-            console.log("MATCH-PTN1- NO MATCH");
             return false;
         }else if (pair_matching_pattern == 2){
-            console.log(top_match[0]);
             var center = rule[3];
             var tail = rule[4];
-            console.log("CENTER",center,"TAIL",tail);
             
             var tail_matchings = [];
             var center_matchings = [];
@@ -564,18 +534,12 @@ Macro.match = function(code,rule,env,nest){
                 }
             }
 
-            console.log("CENTER-MATCHINGS=",center_matchings);
-            console.log("TAIL-MATCHINGS=",tail_matchings);
-            console.log("");
 
-            console.log("PUSH!",env[0]);
             for (var i=0;i<center_matchings.length;i++){
                 env[0][0]++;
                 env[0][1].push(env[0][0]);
 
-                console.log("CM=",center_matchings[i]);
                 if (!Macro.match(center_matchings[i][0],center_matchings[i][1],env,nest+1)){
-                    console.log("MATCH-MACRO-ERROR");
                     return false;
                 }
                 env[0][1].pop();
@@ -604,7 +568,6 @@ Macro.match = function(code,rule,env,nest){
             var shape_stack = env[0][1];
             
             tree.push(nest,code,env[rule[1]],shape_stack);
-            console.log("NEST=",nest);
         }
         return true;
     }else if (rule[0] == Zutsuki.TYPE_VECTOR){
@@ -614,7 +577,6 @@ Macro.match = function(code,rule,env,nest){
             if (code.type != Zutsuki.TYPE_VECTOR){
                 return false;
             }
-            console.log("BOO");
 
             var vdata = code.data;
             if (vdata.length != rule.length - 2){
@@ -649,7 +611,6 @@ Macro.match = function(code,rule,env,nest){
         
         }
 
-        console.log("RULE",rule);
         return true;
     }
 }
@@ -669,7 +630,6 @@ Macro.expand = function(template,env,ellipsis,nest){
                 var ellipsis_counter = 0;
                 while (true){
                     var ellipsis_res = Macro.expand(cell.car,env,ellipsis,nest+1);
-                    console.log("FOOOO",ellipsis_res);
 
                     if (ellipsis_res == Macro.MATCH_END){
                         break;
@@ -705,9 +665,7 @@ Macro.expand = function(template,env,ellipsis,nest){
                         return Macro.MATCH_END;
                     }
                 }
-                console.log("NE",rcell.car);
                 if (rcell.car == Macro.MATCH_END){
-                    console.log("END");
                     return Macro.MATCH_END;
                 }
                 rcell = rcell.cdr;
@@ -736,7 +694,6 @@ Macro.expand = function(template,env,ellipsis,nest){
             }
         }else{
             //(syntaxを定義した場所の環境で識別しを評価する)
-            console.log("TEMP",template);
             return new Zutsuki.RenamedSymbol(template);
 
         }
@@ -752,9 +709,7 @@ Macro.expand = function(template,env,ellipsis,nest){
 
 
 Macro.compare_tree_shape = function(env,nest_set){
-    console.log(nest_set);
     for (var i=0;i<nest_set.length;i++){
-        console.log("!!!",nest_set[i]);   
         if (nest_set[i].length == 0){
             continue;
         }
@@ -788,22 +743,11 @@ Macro.compare_tree_shape = function(env,nest_set){
 
 
 Macro.match_and_convert = function(code,rules,ellipsis,err){
-    console.log("CODE=",code);
     // RULE -> [ pattern template nest_set]
     for (var i=0;i<rules.length;i++){
-        console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        console.log("....");
-        console.log("....");
-        console.log("....");
-        console.log("PATTERN=",Macro.pattern_visualizar(rules[i][0]));
-        console.log("....");
-        console.log("....");
-        console.log("=============================================");
-
-        var env = {};
+            var env = {};
         env[0] = [0,[]];
         if (Macro.match(code,rules[i][0],env,0)){
-            console.log("ENV=",env);
 
             //nest_setとmatch木を比較する。
             if (!Macro.compare_tree_shape(env,rules[i][2])){
@@ -822,7 +766,6 @@ Macro.match_and_convert = function(code,rules,ellipsis,err){
             scheme_test_print(ret);
             return ret;
         }
-        console.log("!!!",env);
     }
 
     //ひとつもマッチしなかった(error)

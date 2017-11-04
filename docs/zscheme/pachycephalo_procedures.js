@@ -432,4 +432,34 @@ Pachycephalo_Procejures.compare_library = function(){
     return res;
 }
 
+Pachycephalo_Procejures.number_library = function(){
+    const Pachycephalo = Pachycephalo_Procejures.pachycephalo;
+    const VMCODE = Pachycephalo.VmCode;
 
+    var intqfun = function(args,err){
+        var obj = args.car;
+
+        if (obj.type == Pachycephalo.TYPE_INTEGER){
+            return Pachycephalo.TRUE_OBJECT;
+        }
+
+        if (obj.type == Pachycephalo.TYPE_FLOAT){
+            if (Number.isInteger(obj.number)){
+                return Pachycephalo.TRUE_OBJECT;
+            }
+        }
+        //TODO 整数型でないものもinteger?の結果が真になるものがあるのでそれを追加する
+        
+        return Pachycephalo.FALSE_OBJECT;
+    }
+
+    var intqfun = new Pachycephalo.JsProcedure1("integer?",intqfun);
+
+
+    var  res = {
+        "integer?":intqfun,
+    };
+    return res;
+
+
+}
