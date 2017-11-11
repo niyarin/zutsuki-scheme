@@ -466,7 +466,6 @@ Macro.push_null = function(rule,env){
 
 
 Macro.match = function(code,rule,env,nest){
-    scheme_test_print(code);
     if (rule[0] == Zutsuki.TYPE_PAIR){
         if (code == null){
             if (nest > 0){
@@ -763,7 +762,6 @@ Macro.match_and_convert = function(code,rules,ellipsis,err){
             }
 
             var ret = Macro.expand(rules[i][1],env,ellipsis,0);
-            scheme_test_print(ret);
             return ret;
         }
     }
