@@ -687,6 +687,8 @@ Array_man.phase1 = function(array_man_code1,env,const_index,init_const_data){
     for (var i=0;i<array_man_code1.length;i++){
         if (Array.isArray(array_man_code1[i]) && array_man_code1[i].length){
             array_man2.push(Array_man.convert_phase_1(array_man_code1[i],const_data,env.global,[]));
+        }else if (Array.isArray(array_man_code1[i]) && array_man_code1[i].length == 0){
+
         }else{
             array_man2.push(array_man_code1[i]);
         }
