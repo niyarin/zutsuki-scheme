@@ -186,7 +186,12 @@ Exr.convert_external_representation = function(input,prepro_flag,is_repl_mode,ac
 
         }
     }
-
+    
+    //トップレベルにquoteのsyntax-sugarがあった場合の処理
+    atom_and_container_objects.unshift(0);
+    atom_and_container_objects = datum_expand(atom_and_container_objects);
+    atom_and_container_objects.shift();
+    
    
     return atom_and_container_objects;
 }
