@@ -1390,6 +1390,12 @@ Expand.Syntax.Define_library = function(){
 
         var lib_env = Expand.create_empty_env();
         
+        //globalに展開したdefine-libraryをこちらから見つけられるようにする , 要検証
+        lib_env.libary = [];
+        for (var i=0;i<env.library.length;i++){
+            lib_env.library.push(env.library[i]);
+        }
+
         //新しいenvにexport import begin include include-ci ...とかをセットする
         lib_env.global["import"] = new Expand.Syntax.Import();
         lib_env.global["export"] = new Expand.Syntax.Export();
