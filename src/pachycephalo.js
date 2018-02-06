@@ -5,7 +5,7 @@ var Pachycephalo = {};
 
 if (is_node){
     module.exports = Pachycephalo;
-    const Pachycephalo_Procejures = require("./pachycephalo_procedures");
+    var Pachycephalo_Procejures = require("./pachycephalo_procedures");
     Pachycephalo_Procejures.pachycephalo = Pachycephalo;
 }
 

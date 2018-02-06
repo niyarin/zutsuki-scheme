@@ -3,7 +3,7 @@ var Compile = {};
 var is_node = typeof require !== "undefined";
 if (is_node){
     module.exports = Compile;
-    const Pachycephalo = require("./pachycephalo");
+    var Pachycephalo = require("./pachycephalo");
 }
 
 const VMCODE = Pachycephalo.VmCode;
